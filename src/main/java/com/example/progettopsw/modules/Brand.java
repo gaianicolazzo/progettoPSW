@@ -19,14 +19,14 @@ public class Brand {
     private Long id;
     @Column(name = "name")
     private String name;
-    /*
+
     @OneToMany(mappedBy = "brand", cascade= CascadeType.ALL)
     @JsonIgnore
     @ToString.Exclude
     private Collection<Product> products = new LinkedList<>();
-*/
+
     public Brand(){}
-    /*
+
     public Brand(Brand brand)
     {
         name=brand.name.toLowerCase();
@@ -37,7 +37,5 @@ public class Brand {
         this.name=nome;
         products=new LinkedList<Product>();
     }
-
-     */
 
 }

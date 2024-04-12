@@ -11,13 +11,13 @@ import java.util.Date;
 import java.util.Optional;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface ClientOrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByClient(Client client);
 
-    Optional<Order> findByClientAndDate(Client client, Date date);
+    Optional<Order> findByClientAndCreatDate(Client client, Date date);
 
 
-    @Query("select o from Order o where o.date > ?1 and o.date < ?2 and o.client = ?3")
+    @Query("select o from Order o where o.creatDate > ?1 and o.creatDate < ?2 and o.client = ?3")
     Optional<Order> findByBuyerInPeriod(Date startDate, Date endDate, Client client);
 }
