@@ -37,7 +37,6 @@ public class AuthService {
         var user = Client.builder().firstName(request.getFirstName()).
                 lastName(request.getLastName()).
                 email(request.getEmail()).
-                username(request.getUsername()).
                 password(passwordEncoder.encode(request.getPassword())).
                 role(Role.USER).build();
         var savedUser = repository.save(user);

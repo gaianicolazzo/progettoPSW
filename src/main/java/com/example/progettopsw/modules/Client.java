@@ -28,11 +28,6 @@ public class Client implements UserDetails {
     private long id;
 
     @Basic
-    @Column(name = "username")
-    @NotBlank
-    private String username;
-
-    @Basic
     @NotBlank
     @Column(name = "first_name")
     private String firstName;
@@ -64,6 +59,11 @@ public class Client implements UserDetails {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override
