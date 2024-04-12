@@ -21,13 +21,6 @@ import java.util.List;
 @Table(name = "client")
 public class Client implements UserDetails {
 
-    public Client(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
