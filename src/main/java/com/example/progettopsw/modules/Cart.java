@@ -1,0 +1,46 @@
+package com.example.progettopsw.modules;
+
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+import lombok.ToString;
+
+import java.util.LinkedList;
+import java.util.List;
+
+@Entity
+@Data
+@Table(name = "cart")
+public class Cart {
+
+
+    @Id
+    @GeneratedValue
+    private long id;
+
+    @Basic
+    @Column(name = "qty", nullable = false)
+    private int qta;
+
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<ProductInCart> products = new LinkedList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "client", referencedColumnName = "id")
+    @ToString.Exclude
+    private Client client;
+
+
+}

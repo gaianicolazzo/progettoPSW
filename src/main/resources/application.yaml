@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    password: 'Gaiadavide2'
+    driver-class-name: org.postgresql.Driver
+    username: 'postgres'
+    url: jdbc:postgresql://localhost:5432/progettoPSW
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
