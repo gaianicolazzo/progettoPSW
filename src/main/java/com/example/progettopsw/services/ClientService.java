@@ -157,15 +157,15 @@ public class ClientService {
     }
 
     @Transactional(readOnly=true)
-    public Client getClientFromUsername(String username) throws UsernameNotFoundException
+    public Client getClientFromEmail(String email) throws UsernameNotFoundException
     {
-        if(username==null)
+        if(email==null)
             throw new UsernameNotFoundException();
-        Optional<Client> client = cr.findByUsername(username.toLowerCase());
+        Optional<Client> client = cr.findByEmail(email.toLowerCase());
         if(client.isPresent())
             return client.get();
         else
-            throw new UsernameNotFoundException();
+            throw new ClientDoesntExistException();
     }
 
     @Transactional(readOnly=true)

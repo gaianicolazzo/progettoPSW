@@ -39,8 +39,8 @@ public class CartController {
     public ResponseEntity<List<ProductInCartDTO>> getProductsInCart(){
         Cart cart = null;
         try{
-            String username = applicationConfig.userDetailsService().toString();
-            Client c = clientService.getClientFromUsername(username);
+            String email = applicationConfig.userDetailsService().toString();
+            Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
         } catch (ClientDoesntExistException | InvalidClientException e){
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -62,8 +62,8 @@ public class CartController {
         Cart cart = null;
         Product productToAdd=null;
         try{
-            String username = applicationConfig.userDetailsService().toString();
-            Client c = clientService.getClientFromUsername(username);
+            String email = applicationConfig.userDetailsService().toString();
+            Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
             Optional<Product> productTmp = productService.showProductsByNameandByCategoryandByColor(form.getProduct().getName(),form.getProduct().getCategory(),form.getProduct().getColor());
             if(!productTmp.isPresent())
@@ -100,8 +100,8 @@ public class CartController {
         Cart cart = null;
         Optional<ProductInCart> productInCart;
         try {
-            String username = applicationConfig.userDetailsService().toString();
-            Client c = clientService.getClientFromUsername(username);
+            String email = applicationConfig.userDetailsService().toString();
+            Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
             productInCart = cartService.getProductInCart(product.getName(), product.getColor(), cart);
             if (!productInCart.isPresent())
@@ -130,8 +130,8 @@ public class CartController {
         Cart cart = null;
         Optional<ProductInCart> productInCart;
         try {
-            String username = applicationConfig.userDetailsService().toString();
-            Client c = clientService.getClientFromUsername(username);
+            String email = applicationConfig.userDetailsService().toString();
+            Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
             boolean res = orderService.crea(cart, products, c);
             if (res) {

@@ -30,12 +30,12 @@ public class ClientController {
     @GetMapping(value = "/orders")
     public ResponseEntity<List<OrderDTO>> getOrdersList(){
         try{
-            String username = applicationConfig.userDetailsService().toString();
-            Client c = clientService.getClientFromUsername(username);
+            String email = applicationConfig.userDetailsService().toString();
+            Client c = clientService.getClientFromEmail(email);
             if (c == null) {
                 return ResponseEntity.notFound().build();
             }
-            List<Order> orders = orderService.getOrdini(username);
+            List<Order> orders = orderService.getOrdini(email);
             if(orders.size()==0){
                 return ResponseEntity.notFound().build();
             }

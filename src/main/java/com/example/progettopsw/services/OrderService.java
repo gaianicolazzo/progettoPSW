@@ -98,8 +98,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<Order> getOrdini(String username){
-        Client c = clientR.findByUsername(username).get();
+    public List<Order> getOrdini(String email){
+        Client c = clientR.findByEmail(email).get();
         return c.getOrders();
 
     }
