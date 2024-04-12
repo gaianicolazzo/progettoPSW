@@ -8,6 +8,7 @@ import lombok.Data;
 
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name= "productInCart")
@@ -17,6 +18,7 @@ public class ProductInCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     @Column(name = "id")
     private long id;
 

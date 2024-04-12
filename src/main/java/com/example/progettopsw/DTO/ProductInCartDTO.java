@@ -2,15 +2,14 @@ package com.example.progettopsw.DTO;
 
 import com.example.progettopsw.modules.OrderDetail;
 import com.example.progettopsw.modules.ProductInCart;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Setter
 @Getter
 @EqualsAndHashCode
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductInCartDTO {
 
     private double prize;

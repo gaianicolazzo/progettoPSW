@@ -32,8 +32,10 @@ public class CartController {
     ClientService clientService;
     @Autowired
     OrderService orderService;
+
     @Autowired
     ApplicationConfig applicationConfig;
+
 
     @GetMapping
     public ResponseEntity<List<ProductInCartDTO>> getProductsInCart(){
@@ -56,16 +58,16 @@ public class CartController {
     }
 
 
-    //@PreAuthorize("hasAuthority('utente')")
-    @PostMapping
-    public ResponseEntity<String> addProductInCart(@RequestBody ProductInCartDTO form){
+    @PreAuthorize("hasAuthority('client')")
+    @PostMapping("/addProductInCart")
+    public ResponseEntity<String> addProductInCart(@RequestBody ProductDTO product){
         Cart cart = null;
         Product productToAdd=null;
         try{
             String email = applicationConfig.userDetailsService().toString();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
-            Optional<Product> productTmp = productService.showProductsByNameandByCategoryandByColor(form.getProduct().getName(),form.getProduct().getCategory(),form.getProduct().getColor());
+            Optional<Product> productTmp = productService.showProductsByNameandByCategoryandByColor(product.getName(),product.getCategory(),product.getColor());
             if(!productTmp.isPresent())
                 return new ResponseEntity<>("Product not present in shop", HttpStatus.NOT_FOUND);
             productToAdd = productTmp.get();
@@ -75,7 +77,7 @@ public class CartController {
             return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
         }
         try{
-            Product ret = clientService.addProduct(cart, productToAdd, form.getQty());
+            Product ret = clientService.addProduct(cart, productToAdd, product.getAvailablePz()); // richiamiamo getAvailablePz ma in realta i pezzi disponibili sono in productToAdd mentre il primo fa riferimento alla quantita che vogliamo
             return new ResponseEntity<>(ret.toString(),HttpStatus.OK);
         }catch(InvalidProductException ipe){
             return new ResponseEntity<>("Invalid product", HttpStatus.NOT_ACCEPTABLE);
@@ -94,7 +96,7 @@ public class CartController {
         }
 
     }
-    //@PreAuthorize("hasAuthority('utente')")
+    //@PreAuthorize("hasAuthority('client')")
     @PostMapping("/remove")
     public ResponseEntity<String> removeProductFromCart(@RequestBody ProductDTO product) {
         Cart cart = null;
