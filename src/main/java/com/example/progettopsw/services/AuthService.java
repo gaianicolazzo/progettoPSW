@@ -3,8 +3,10 @@ package com.example.progettopsw.services;
 import com.example.progettopsw.controllers.AuthRequest;
 import com.example.progettopsw.controllers.AuthResponse;
 import com.example.progettopsw.controllers.RegisterRequest;
+import com.example.progettopsw.modules.Cart;
 import com.example.progettopsw.modules.Client;
 import com.example.progettopsw.modules.Role;
+import com.example.progettopsw.repositories.CartRepository;
 import com.example.progettopsw.repositories.ClientRepository;
 import com.example.progettopsw.security.JwtService;
 import com.example.progettopsw.token.Token;
@@ -29,17 +31,23 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    private final CartRepository cartRepository;
     private final AuthenticationManager authenticationManager;
 
     private final TokenRepository tokenRepository;
 
     public AuthResponse register(RegisterRequest request) {
-        var user = Client.builder().firstName(request.getFirstName()).
+        Cart cartClient = new Cart();
+        Client user = Client.builder().firstName(request.getFirstName()).
                 lastName(request.getLastName()).
                 email(request.getEmail()).
                 password(passwordEncoder.encode(request.getPassword())).
-                role(Role.USER).build();
+                role(Role.USER).
+                cart(cartClient).
+                build();
+        cartClient.setClient(user);
         var savedUser = repository.save(user);
+        cartRepository.save(cartClient);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);

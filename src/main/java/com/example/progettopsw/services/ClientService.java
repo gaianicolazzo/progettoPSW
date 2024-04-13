@@ -111,13 +111,17 @@ public class ClientService {
         if(foundProduct.isEmpty()) return null;
         ProductInCart pc = new ProductInCart();
         int availablePz = foundProduct.get().getAvailablePz();
+        int qtyCart = cart.getQta();
         if(availablePz > qty) {
             pc.setQty(qty);
             pc.setProd(product);
             pc.setPrize(product.getPrize());
             cart.getProducts().add(pc);
+            cart.setQta(qtyCart++);
+            foundProduct.get().setAvailablePz(availablePz-qty);
             carep.save(foundCart.get());
             prodincrep.save(pc);
+            prep.save(foundProduct.get());
             return product;
         }
         return null;

@@ -43,12 +43,17 @@ public class Client implements UserDetails {
     private String email;
 
     @Basic
-    @NotBlank
     @Column(name = "password")
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public Client(String email, String firstName, String lastName) {
+        this.email= email;
+        this.firstName=firstName;
+        this.lastName=lastName;
+    }
 
 
     @Override
@@ -92,8 +97,8 @@ public class Client implements UserDetails {
     @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
     private List<Order> orders = new LinkedList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart", referencedColumnName = "id")
+    @OneToOne(mappedBy = "client", cascade=CascadeType.ALL)
+    @JsonIgnore
     private Cart cart;
 
 }

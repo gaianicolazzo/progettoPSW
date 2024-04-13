@@ -6,6 +6,7 @@ import com.example.progettopsw.DTO.ProductInCartDTO;
 import com.example.progettopsw.exceptions.*;
 import com.example.progettopsw.modules.*;
 import com.example.progettopsw.security.ApplicationConfig;
+import com.example.progettopsw.security.JwtService;
 import com.example.progettopsw.services.CartService;
 import com.example.progettopsw.services.ClientService;
 import com.example.progettopsw.services.OrderService;
@@ -15,6 +16,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -37,12 +39,15 @@ public class CartController {
     @Autowired
     ApplicationConfig applicationConfig;
 
+    @Autowired
+    JwtService jwt;
+
 
     @GetMapping
-    public ResponseEntity<List<ProductInCartDTO>> getProductsInCart(){
+    public ResponseEntity<List<ProductInCartDTO>> getProductsInCart(Authentication auth){
         Cart cart = null;
         try{
-            String email = applicationConfig.userDetailsService().toString();
+            String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
         } catch (ClientDoesntExistException | InvalidClientException e){
@@ -61,11 +66,11 @@ public class CartController {
 
     @PreAuthorize("hasAuthority('client')")
     @PostMapping("/addProductInCart")
-    public ResponseEntity<String> addProductInCart(@RequestBody ProductDTO product, Principal principal){
+    public ResponseEntity<String> addProductInCart(@RequestBody ProductDTO product, Authentication auth){
         Cart cart = null;
         Product productToAdd=null;
         try{
-            String email = principal.getName();
+            String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
             Optional<Product> productTmp = productService.showProductsByNameandByCategoryandByColor(product.getName(),product.getCategory(),product.getColor());
@@ -73,7 +78,7 @@ public class CartController {
                 return new ResponseEntity<>("Product not present in shop", HttpStatus.NOT_FOUND);
             productToAdd = productTmp.get();
         } catch(InvalidClientException e){
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("User not found "+ auth.getName(), HttpStatus.NOT_FOUND);
         }catch (ProductNotFoundException e){
             return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
         }
@@ -97,13 +102,13 @@ public class CartController {
         }
 
     }
-    //@PreAuthorize("hasAuthority('client')")
+    @PreAuthorize("hasAuthority('client')")
     @PostMapping("/remove")
-    public ResponseEntity<String> removeProductFromCart(@RequestBody ProductDTO product) {
+    public ResponseEntity<String> removeProductFromCart(@RequestBody ProductDTO product, Authentication auth) {
         Cart cart = null;
         Optional<ProductInCart> productInCart;
         try {
-            String email = applicationConfig.userDetailsService().toString();
+            String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
             productInCart = cartService.getProductInCart(product.getName(), product.getColor(), cart);
@@ -127,9 +132,9 @@ public class CartController {
             return new ResponseEntity<>("Operation not completed ", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    //@PreAuthorize("hasAuthority('client')")
+    @PreAuthorize("hasAuthority('client')")
     @PostMapping(value="/order")
-    public ResponseEntity<String> order(@RequestBody List<ProductInCartDTO> products) {
+    public ResponseEntity<String> order(@RequestBody List<ProductInCartDTO> products, Authentication auth) {
         Cart cart = null;
         Optional<ProductInCart> productInCart;
         try {
