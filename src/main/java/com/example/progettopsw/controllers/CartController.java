@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -60,11 +61,11 @@ public class CartController {
 
     @PreAuthorize("hasAuthority('client')")
     @PostMapping("/addProductInCart")
-    public ResponseEntity<String> addProductInCart(@RequestBody ProductDTO product){
+    public ResponseEntity<String> addProductInCart(@RequestBody ProductDTO product, Principal principal){
         Cart cart = null;
         Product productToAdd=null;
         try{
-            String email = applicationConfig.userDetailsService().toString();
+            String email = principal.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
             Optional<Product> productTmp = productService.showProductsByNameandByCategoryandByColor(product.getName(),product.getCategory(),product.getColor());

@@ -29,6 +29,7 @@ public class SecurityConfig {
                 "/swagger-ui/**",
                 "/webjars/**",
                 "/swagger-ui.html",
+                "/api/v1/demo-controller/**",
                 "/product/**",
                 "/client/**",
                 "/admin/**",
@@ -36,7 +37,6 @@ public class SecurityConfig {
                 anyRequest().authenticated(). // mentre quelle che non lo matchano devono essere autenticate
                 and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS). // crea una sessione per ogni richiesta
                 and().authenticationProvider(authenticationProvider).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // vogliamo che sia eseguito questo filtro prima del filtro chiamato usernamepasswordauth
-                
         return http.build();
     }
 
