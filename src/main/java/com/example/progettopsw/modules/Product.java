@@ -62,6 +62,7 @@ public class Product {
     @Column(name = "category")
     private String category;
     @Version
+    @JsonIgnore
     @Column(name = "version")
     private long version;
 
