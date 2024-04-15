@@ -87,11 +87,13 @@ public class ClientService {
         if(foundCart.isPresent()){
             List<ProductInCart> products = foundCart.get().getProducts();
 
+            int cartQty = foundCart.get().getQta();
+
             for(ProductInCart product: products) {
                 if (product.equals(productInCart.get()))
                     if (product.getQty() == qty) {
                         foundCart.get().getProducts().remove(productInCart.get());
-                        foundCart.get().setQta(foundCart.get().getQta()-1);
+                        foundCart.get().setQta(cartQty--);
                         prodincrep.delete(productInCart.get());
                     } else {
                         product.setQty(product.getQty() - qty);
@@ -108,19 +110,23 @@ public class ClientService {
 
     public Product addProduct(Cart cart, Product product, int qty){
         Optional<Cart> foundCart=carep.findById(cart.getId());
-        if(foundCart.isEmpty()) return null;
+
+        if(foundCart.isEmpty())
+            return null;
         Optional<Product> foundProduct= prep.findById(product.getId());
-        if(foundProduct.isEmpty()) return null;
+        if(foundProduct.isEmpty())
+            return null;
+
         ProductInCart pc = new ProductInCart();
         int availablePz = foundProduct.get().getAvailablePz();
         int qtyCart = cart.getQta();
+
         if(availablePz > qty) {
             pc.setQty(qty);
             pc.setProd(product);
             pc.setPrize(product.getPrize());
             cart.getProducts().add(pc);
             cart.setQta(qtyCart++);
-            foundProduct.get().setAvailablePz(availablePz-qty);
             carep.save(foundCart.get());
             prodincrep.save(pc);
             prep.save(foundProduct.get());
@@ -140,14 +146,14 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Order>  ClientsOrders(Client c){
+    public Optional<Order> clientsOrders(Client c){
         if(c == null)
             throw new ClientDoesntExistException();
         return  orderep.findByClient(c);
     }
 
     @Transactional(readOnly = true)
-    public Optional<Order>  ClientsOrdersInDate(Client c, Date date){
+    public Optional<Order>  clientsOrdersInDate(Client c, Date date){
         if(c == null)
             throw new ClientDoesntExistException();
 
@@ -155,7 +161,7 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Order>  ClientsOrdersBetweenDates(Client c, Date firstDate, Date lastDate){
+    public Optional<Order>  clientsOrdersBetweenDates(Client c, Date firstDate, Date lastDate){
         if(c == null)
             throw new ClientDoesntExistException();
 

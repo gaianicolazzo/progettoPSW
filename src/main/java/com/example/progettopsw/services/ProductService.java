@@ -41,10 +41,14 @@ public class ProductService {
 
     @Transactional(readOnly = false)
     public Product addProduct(Product p) throws BarCodeAlrExistException {
+        Brand brand = p.getBrand();
+        if(brand == null || ! brandRepository.existsByName(brand.getName().toLowerCase()))
+            throw new BrandNotFoundException();
+        brand = brandRepository.findByName(brand.getName().toLowerCase());
         if(p.getBarCode() != null && productRepository.existsByBarCode(p.getBarCode()))
             throw new BarCodeAlrExistException();
-        productRepository.save(p);
-        return p;
+        brand.getProducts().add(p);
+        return productRepository.save(p);
     }
 
 

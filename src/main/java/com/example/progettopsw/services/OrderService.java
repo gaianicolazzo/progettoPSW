@@ -60,15 +60,13 @@ public class OrderService {
                 throw new PrizeChangedException("Il prezzo del prodotto è cambiato nel prezzo " + p.getPrize());
             if(p.getAvailablePz() < itd.getQty())
                 throw new QtyUnavaliableException(p.getName());
-            if(p.equals(itd.getProduct())){
-                OrderDetail dto = new OrderDetail();
-                dto.setProduct(p);
-                dto.setPrize(itd.getPrize());
-                dto.setQty(itd.getQty());
-                addprep.save(dto);
-                o.getDetails().add(dto);
-                p.setAvailablePz(p.getAvailablePz()-dto.getQty());
-            }
+            OrderDetail dto = new OrderDetail();
+            dto.setProduct(p);
+            dto.setPrize(itd.getPrize());
+            dto.setQty(itd.getQty());
+            addprep.save(dto);
+            o.getDetails().add(dto);
+            op.get().setAvailablePz(op.get().getAvailablePz()-p.getAvailablePz());
         }
         return true;
     }
@@ -86,12 +84,12 @@ public class OrderService {
 
         for(ProductInCart cartProduct : supportList)
         {
-            Optional<ProductInCart> foundProduct =
-                    pricrep.findById(cartProduct.getId());
+            Optional<ProductInCart> foundProduct = pricrep.findById(cartProduct.getId());
             if(!foundProduct.isPresent())
                 throw new ProductNotFoundException();
             foundCart.get().getProducts().remove((foundProduct.get()));
         }
+        foundCart.get().setQta(0);
         cartRepository.save(foundCart.get());
         pricrep.deleteAll(supportList);
 
