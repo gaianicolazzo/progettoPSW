@@ -61,6 +61,9 @@ public class Product {
     @NotBlank
     @Column(name = "category")
     private String category;
+    @Version
+    @Column(name = "version")
+    private long version;
 
 
 

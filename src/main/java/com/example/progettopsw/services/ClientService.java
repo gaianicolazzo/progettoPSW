@@ -54,6 +54,7 @@ public class ClientService {
             foundClient.get().setEmail(c.getEmail());
             foundClient.get().setFirstName(c.getFirstName());
             foundClient.get().setLastName(c.getLastName());
+            foundClient.get().setVersion(foundClient.get().getVersion()+1);
         }
         throw new ClientDoesntExistException();
     }
@@ -90,6 +91,7 @@ public class ClientService {
                 if (product.equals(productInCart.get()))
                     if (product.getQty() == qty) {
                         foundCart.get().getProducts().remove(productInCart.get());
+                        foundCart.get().setQta(foundCart.get().getQta()-1);
                         prodincrep.delete(productInCart.get());
                     } else {
                         product.setQty(product.getQty() - qty);

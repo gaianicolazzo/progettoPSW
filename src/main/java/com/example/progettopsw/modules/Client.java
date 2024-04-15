@@ -62,6 +62,9 @@ public class Client implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+    @Version
+    @JsonIgnore
+    private long version;
 
     @Override
     public String getPassword() {
