@@ -29,11 +29,10 @@ public class Order {
     @JsonIgnore
     private Client client;
 
-    @OneToMany( cascade=CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
     private Collection<OrderDetail> details = new LinkedList<>();
     @Version
     private long version;
-
 
 }
 

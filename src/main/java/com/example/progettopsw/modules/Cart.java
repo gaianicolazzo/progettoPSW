@@ -41,9 +41,10 @@ public class Cart {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<ProductInCart> products = new LinkedList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(optional = false)
     @JoinColumn(name = "client", referencedColumnName = "id")
     @ToString.Exclude
+    @JsonIgnore
     private Client client;
 
 

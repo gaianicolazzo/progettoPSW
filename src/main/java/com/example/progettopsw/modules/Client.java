@@ -53,6 +53,8 @@ public class Client implements UserDetails {
         this.email= email;
         this.firstName=firstName;
         this.lastName=lastName;
+        this.orders=new LinkedList<>();
+        this.cart=null;
     }
 
 
@@ -95,6 +97,7 @@ public class Client implements UserDetails {
     private List<Token> tokens;
 
     @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Order> orders = new LinkedList<>();
 
     @OneToOne(mappedBy = "client", cascade=CascadeType.ALL)
