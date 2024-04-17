@@ -19,7 +19,7 @@ public class ProductInCartDTO {
     public ProductInCartDTO(ProductInCart product){
         prize = product.getPrize();
         qty = product.getQty();
-        this.product = new ProductDTO(product.getProd());
+        this.product = new ProductDTO(product.getProduct());
     }
 
     public ProductInCartDTO(OrderDetail product){

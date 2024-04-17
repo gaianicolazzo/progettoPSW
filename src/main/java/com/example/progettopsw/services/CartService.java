@@ -46,7 +46,7 @@ public class CartService {
         for(ProductInCart pc : foundCart.get().getProducts()){
             Optional<ProductInCart> foundProduct = prodincartrep.findById(pc.getId());
             if(foundProduct.isPresent())
-                if(pc.getProd().getName().toLowerCase().equals(productName) && pc.getProd().getColor().equals(color))
+                if(pc.getProduct().getName().toLowerCase().equals(productName) && pc.getProduct().getColor().equals(color))
                     return Optional.of(foundProduct.get());
 
         }
