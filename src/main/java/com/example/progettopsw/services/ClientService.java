@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.*;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,30 +110,40 @@ public class ClientService {
 
 
     public Product addProduct(Cart cart, Product product, int qty){
+        if(product == null || product.getPrize()<0.0)
+            throw new InvalidProductException();
+        if(cart == null)
+            throw new CartNotFoundException();
         Optional<Cart> foundCart=carep.findById(cart.getId());
 
         if(foundCart.isEmpty())
-            return null;
+            throw new CartNotFoundException();
         Optional<Product> foundProduct= prep.findById(product.getId());
         if(foundProduct.isEmpty())
-            return null;
+            throw new InvalidProductException();
 
-        ProductInCart pc = new ProductInCart();
-        int availablePz = foundProduct.get().getAvailablePz();
+        if(foundProduct.get().getAvailablePz()<1)
+            throw new ProductOutOfStockException();
+        if(foundProduct.get().getAvailablePz()<qty)
+            throw new QtyUnavaliableException();
+
+        ProductInCart pc = new ProductInCart(foundProduct.get());
+        pc.setQty(qty);
+
         int qtyCart = cart.getQta();
 
-        if(availablePz > qty) {
-            pc.setQty(qty);
-            pc.setProd(product);
-            pc.setPrize(product.getPrize());
-            cart.getProducts().add(pc);
-            cart.setQta(qtyCart++);
-            carep.save(foundCart.get());
-            prodincrep.save(pc);
-            prep.save(foundProduct.get());
-            return product;
+        if(foundCart.get().getProducts() == null){
+            foundCart.get().setProducts(new LinkedList<>());
+        }else if(foundCart.get().getProducts().contains(pc)){
+            throw new ProductAlreadyInCartException();
         }
-        return null;
+
+        cart.getProducts().add(pc);
+        cart.setQta(qtyCart++);
+
+        carep.save(foundCart.get());
+
+        return product;
     }
 
     @Transactional(readOnly = true)

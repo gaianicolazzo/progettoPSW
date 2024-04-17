@@ -23,7 +23,7 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping("/test")
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<List<Product>> getProductTest(){
         List<Product> a = productService.showAllProducts();
         return new ResponseEntity<>(a, HttpStatus.OK);

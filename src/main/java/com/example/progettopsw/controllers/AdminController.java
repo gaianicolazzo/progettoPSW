@@ -26,7 +26,7 @@ public class AdminController {
     @Autowired
     ProductService productService;
 
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     @PostMapping(value="product")
     public ResponseEntity<String> putProduct(@RequestBody ProductDTO product)
     {

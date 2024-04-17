@@ -10,6 +10,7 @@ import com.example.progettopsw.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -26,7 +27,7 @@ public class ClientController {
     ApplicationConfig applicationConfig;
 
 
-    //@PreAuthorize("hasAuthority('client')")
+    @PreAuthorize("hasAuthority('client')")
     @GetMapping(value = "/orders")
     public ResponseEntity<List<OrderDTO>> getOrdersList(){
         try{
