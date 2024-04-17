@@ -120,7 +120,7 @@ public class CartController {
             return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
         }
         try {
-            boolean res = clientService.deleteProduct(cart, productInCart.get(), productInCart.get().getQty());
+            boolean res = clientService.deleteProduct(cart, productInCart.get(), product.getAvailablePz());
             return res ? new ResponseEntity<>(String.valueOf(true), HttpStatus.OK) : new ResponseEntity<>(String.valueOf(false), HttpStatus.NOT_FOUND);
         } catch (ProductNotFoundException pnfe) {
             return new ResponseEntity<>("Product already cancelled", HttpStatus.NOT_FOUND);
@@ -138,7 +138,7 @@ public class CartController {
         Cart cart = null;
         Optional<ProductInCart> productInCart;
         try {
-            String email = applicationConfig.userDetailsService().toString();
+            String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
             boolean res = orderService.crea(cart, products, c);

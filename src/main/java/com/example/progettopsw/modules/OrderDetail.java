@@ -18,12 +18,10 @@ public class OrderDetail {
 
     @Basic
     @Column(name = "qty")
-    @NotBlank
     private int qty;
 
     @Basic
     @Column(name = "prize")
-    @NotBlank
     private double prize;
     @ManyToOne(optional = false)
     private Product product;

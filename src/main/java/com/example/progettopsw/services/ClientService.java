@@ -88,21 +88,18 @@ public class ClientService {
         if(foundCart.isPresent()){
             List<ProductInCart> products = foundCart.get().getProducts();
 
-            int cartQty = foundCart.get().getQty();
-
             for(ProductInCart product: products) {
                 if (product.equals(productInCart.get()))
-                    if (product.getQty() == qty) {
+                    if (productInCart.get().getQty() == qty) {
+                        System.out.println("entro qui");
                         foundCart.get().getProducts().remove(productInCart.get());
-                        foundCart.get().setQty(cartQty--);
-                        prodincrep.delete(productInCart.get());
                     } else {
                         product.setQty(product.getQty() - qty);
-                        prodincrep.save(product);
                     }
                 break;
             }
             carep.save(foundCart.get());
+            prodincrep.delete(productInCart.get());
             return true;
         }
         return false;
