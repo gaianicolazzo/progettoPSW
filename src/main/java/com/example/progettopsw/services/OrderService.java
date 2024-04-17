@@ -34,6 +34,9 @@ public class OrderService {
     @Autowired
     ProductInCartRepository pricrep;
 
+    @Autowired
+    ClientService cserv;
+
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = {QtyUnavaliableException.class, PrizeChangedException.class})
     public boolean crea(Cart cart, List<ProductInCartDTO> items, Client client) throws QtyUnavaliableException, PrizeChangedException, ProductOutOfStockException,InvalidClientException, CartNotFoundException{
         if(items.isEmpty())
@@ -66,7 +69,8 @@ public class OrderService {
             dto.setQty(itd.getQty());
             addprep.save(dto);
             o.getDetails().add(dto);
-            op.get().setAvailablePz(op.get().getAvailablePz()-p.getAvailablePz());
+            p.setAvailablePz(p.getAvailablePz()- itd.getQty());
+            cleanCart(cart);
         }
         return true;
     }
