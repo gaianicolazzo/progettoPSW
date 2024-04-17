@@ -27,7 +27,7 @@ public class Cart {
 
     @Basic
     @Column(name = "qty", nullable = false)
-    private int qta;
+    private int qty;
 
 
     public void setId(long id) {

@@ -7,6 +7,7 @@ import com.example.progettopsw.exceptions.InvalidProductException;
 import com.example.progettopsw.exceptions.ProductAlreadyExistsException;
 import com.example.progettopsw.modules.Brand;
 import com.example.progettopsw.modules.Product;
+import com.example.progettopsw.repositories.BrandRepository;
 import com.example.progettopsw.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -26,17 +27,20 @@ public class AdminController {
     @Autowired
     ProductService productService;
 
+
+
     @PreAuthorize("hasAuthority('admin')")
     @PostMapping(value="product")
     public ResponseEntity<String> putProduct(@RequestBody ProductDTO product)
     {
         {
             Product ret = new Product();
+            Brand brand = productService.getBrandByName(product.getBrand().toLowerCase()).get();
             try{
                 ret.setAvailablePz(product.getAvailablePz());
                 ret.setPrize(product.getPrize());
                 ret.setName(product.getName());
-                ret.setBrand(new Brand(product.getBrand()));
+                ret.setBrand(brand);
                 ret.setBarCode(product.getBarCode());
                 ret.setCreatData(product.getCreatData());
                 ret.setDescr(product.getDescr());
@@ -58,7 +62,7 @@ public class AdminController {
         }
     }
 
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     @PostMapping(value="brand")
     public ResponseEntity<String> putBrand(@RequestBody String nomeBrand) {
         Brand ret = null;
@@ -75,7 +79,7 @@ public class AdminController {
         return new ResponseEntity<>(ret.getName(), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     @GetMapping
     public ResponseEntity<Product> getProductsByBarCode(
             @RequestParam(value = "barCode",required = false) String barCode){

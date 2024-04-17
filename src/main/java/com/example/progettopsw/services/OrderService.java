@@ -89,7 +89,7 @@ public class OrderService {
                 throw new ProductNotFoundException();
             foundCart.get().getProducts().remove((foundProduct.get()));
         }
-        foundCart.get().setQta(0);
+        foundCart.get().setQty(0);
         cartRepository.save(foundCart.get());
         pricrep.deleteAll(supportList);
 

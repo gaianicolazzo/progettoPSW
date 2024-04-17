@@ -41,11 +41,11 @@ public class AuthService {
         Client user = Client.builder().firstName(request.getFirstName()).
                 lastName(request.getLastName()).
                 email(request.getEmail()).
+                cart(cartClient).
                 password(passwordEncoder.encode(request.getPassword())).
                 role(Role.USER).
                 build();
         cartClient.setClient(user);
-        user.setCart(cartClient);
         var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);

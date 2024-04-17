@@ -111,7 +111,7 @@ public class CartController {
             String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
-            productInCart = cartService.getProductInCart(product.getName(), product.getColor(), cart);
+            productInCart = clientService.getProductFromCart(product.getName(), product.getColor(), cart);
             if (!productInCart.isPresent())
                 return new ResponseEntity<>("Product not present in cart", HttpStatus.NOT_FOUND);
         } catch (InvalidClientException e) {

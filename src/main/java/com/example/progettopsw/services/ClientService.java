@@ -88,13 +88,13 @@ public class ClientService {
         if(foundCart.isPresent()){
             List<ProductInCart> products = foundCart.get().getProducts();
 
-            int cartQty = foundCart.get().getQta();
+            int cartQty = foundCart.get().getQty();
 
             for(ProductInCart product: products) {
                 if (product.equals(productInCart.get()))
                     if (product.getQty() == qty) {
                         foundCart.get().getProducts().remove(productInCart.get());
-                        foundCart.get().setQta(cartQty--);
+                        foundCart.get().setQty(cartQty--);
                         prodincrep.delete(productInCart.get());
                     } else {
                         product.setQty(product.getQty() - qty);
@@ -130,17 +130,20 @@ public class ClientService {
         ProductInCart pc = new ProductInCart(foundProduct.get());
         pc.setQty(qty);
 
-        int qtyCart = cart.getQta();
+        int qtyCart = foundCart.get().getQty();
 
         if(foundCart.get().getProducts() == null){
             foundCart.get().setProducts(new LinkedList<>());
         }else if(foundCart.get().getProducts().contains(pc)){
-            throw new ProductAlreadyInCartException();
+            for(ProductInCart p : foundCart.get().getProducts())
+                if(p.equals(pc))
+                    p.setQty(p.getQty()+qty);
+            carep.save(foundCart.get());
+            return product;
         }
 
-        cart.getProducts().add(pc);
-        cart.setQta(qtyCart++);
-
+        foundCart.get().getProducts().add(pc);
+        foundCart.get().setQty(foundCart.get().getProducts().size());
         carep.save(foundCart.get());
 
         return product;
@@ -150,6 +153,7 @@ public class ClientService {
     public Optional<ProductInCart> showProductsById(long id){
         return prodincrep.findById(id);
     }
+
 
     @Transactional(readOnly = true)
     public List<ProductInCart> showAllProductsInCart() {
@@ -201,6 +205,29 @@ public class ClientService {
             return cart.get();
         else
             throw new InvalidClientException();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ProductInCart> getProductFromCart(String name, String color, Cart cart){
+        if(name == null){
+            throw new InvalidProductException();
+        }
+        if(cart == null){
+            throw new CartNotFoundException();
+        }
+
+        Optional<Cart> foundCart = carep.findById(cart.getId());
+        if(foundCart.isEmpty()){
+            throw new CartNotFoundException();
+        }
+        for(ProductInCart prodInCart : foundCart.get().getProducts()){
+            Optional<ProductInCart> foundProduct = prodincrep.findById(prodInCart.getId());
+            if(foundProduct.isPresent()){
+                if(foundProduct.get().getProduct().getName().equalsIgnoreCase(name) && foundProduct.get().getProduct().getColor().equals(color))
+                    return foundProduct;
+            }
+        }
+        return Optional.empty();
     }
 
 }

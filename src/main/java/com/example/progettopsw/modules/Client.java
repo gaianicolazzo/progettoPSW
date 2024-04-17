@@ -39,7 +39,7 @@ public class Client implements UserDetails {
 
     @Basic
     @NotBlank
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Basic

@@ -66,6 +66,17 @@ public class Product {
     @Column(name = "version")
     private long version;
 
+    public Product(Product p) {
+        name = p.name.toLowerCase();
+        prize = p.prize;
+        availablePz = p.availablePz;
+        category = p.category;
+        color=p.color;
+        descr=p.descr;
+        creatData=p.creatData;
+        barCode=p.barCode;
+        brand = new Brand(p.brand);
+    }
 
 
     public void setId(Long id) {

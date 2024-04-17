@@ -7,6 +7,7 @@ import com.example.progettopsw.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,9 +45,14 @@ public class ProductService {
         Brand brand = p.getBrand();
         if(brand == null || ! brandRepository.existsByName(brand.getName().toLowerCase()))
             throw new BrandNotFoundException();
-        brand = brandRepository.findByName(brand.getName().toLowerCase());
+        brand = brandRepository.findByName(brand.getName().toLowerCase()).get();
         if(p.getBarCode() != null && productRepository.existsByBarCode(p.getBarCode()))
             throw new BarCodeAlrExistException();
+        if(p.getAvailablePz() < 1 || p.getPrize()<=0.0)
+            throw new InvalidProductException();
+        Product product = new Product(p);
+        product.setBrand(brand);
+
         brand.getProducts().add(p);
         return productRepository.save(p);
     }
@@ -65,6 +71,11 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Optional<Product> showProductsByBarCode(String barCode){
         return productRepository.findByBarCode(barCode);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Brand> getBrandByName(String name){
+        return brandRepository.findByName(name);
     }
 
     public List<Product> showAvailablePieces(int qty){
