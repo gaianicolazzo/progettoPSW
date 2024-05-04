@@ -91,7 +91,6 @@ public class ClientService {
             for(ProductInCart product: products) {
                 if (product.equals(productInCart.get()))
                     if (productInCart.get().getQty() == qty) {
-                        System.out.println("entro qui");
                         foundCart.get().getProducts().remove(productInCart.get());
                     } else {
                         product.setQty(product.getQty() - qty);

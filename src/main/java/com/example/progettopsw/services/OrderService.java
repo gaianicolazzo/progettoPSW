@@ -56,7 +56,7 @@ public class OrderService {
         o.setCreatDate(new Date(System.currentTimeMillis()));
         ordrep.save(o);
         for(ProductInCartDTO itd:items){
-            Optional<Product> op = prep.findProductByNameAndCategoryAndColor(itd.getProduct().getName(),itd.getProduct().getCategory(), itd.getProduct().getColor());
+            Optional<Product> op = prep.findProductByCategory(itd.getProduct().getCategory());
             if(!op.isPresent()) throw new ProductOutOfStockException();
             Product p = op.get();
             if(p.getPrize() != itd.getPrize())

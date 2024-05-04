@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value= "/product")
+@CrossOrigin("*")
 public class ProductController {
     @Autowired
     ProductService productService;
@@ -60,12 +61,10 @@ public class ProductController {
     @GetMapping("/filtered")
     public ResponseEntity<List<ProductDTO>> getProductsByCharacteristics(
             @RequestParam(value = "category",required = false) String category,
-            @RequestParam(value = "name",required = false) String name,
-            @RequestParam(value = "color",required = false) String color,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
 
-        Optional<Product> filteredProducts = productService.showProductsByNameandByCategoryandByColor(name,category,color);
+        Optional<Product> filteredProducts = productService.showProductsByCategory(category);
 
 
         // Paginate the results based on page and pageSize

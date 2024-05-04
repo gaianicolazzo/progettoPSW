@@ -59,8 +59,8 @@ public class ProductService {
 
 
     @Transactional(readOnly = true)
-    public Optional<Product> showProductsByNameandByCategoryandByColor(String name,String category, String color){
-        return productRepository.findProductByNameAndCategoryAndColor(name, category,color);
+    public Optional<Product> showProductsByCategory(String category){
+        return productRepository.findProductByCategory(category);
     }
 
     @Transactional(readOnly = true)
@@ -109,6 +109,7 @@ public class ProductService {
 
         return brandRepository.save(brandToLowerCase);
     }
+
 
 
 }

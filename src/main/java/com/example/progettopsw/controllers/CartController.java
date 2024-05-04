@@ -26,6 +26,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value= "/cart")
+@CrossOrigin("*")
 public class CartController {
     @Autowired
     ProductService productService;
@@ -73,7 +74,7 @@ public class CartController {
             String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
-            Optional<Product> productTmp = productService.showProductsByNameandByCategoryandByColor(product.getName(),product.getCategory(),product.getColor());
+            Optional<Product> productTmp = productService.showProductsByCategory(product.getCategory());
             if(!productTmp.isPresent())
                 return new ResponseEntity<>("Product not present in shop", HttpStatus.NOT_FOUND);
             productToAdd = productTmp.get();
