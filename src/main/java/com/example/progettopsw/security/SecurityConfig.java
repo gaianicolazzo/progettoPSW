@@ -33,7 +33,8 @@ public class SecurityConfig {
                 "/product/**",
                 "/client/**",
                 "/admin/**",
-                "/cart/**").permitAll(). // permetto tutte le richieste che matchano quel pattern
+                "/cart/**").permitAll().
+                // permetto tutte le richieste che matchano quel pattern
                 anyRequest().authenticated(). // mentre quelle che non lo matchano devono essere autenticate
                 and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS). // crea una sessione per ogni richiesta
                 and().authenticationProvider(authenticationProvider).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // vogliamo che sia eseguito questo filtro prima del filtro chiamato usernamepasswordauth

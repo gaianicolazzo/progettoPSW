@@ -38,13 +38,24 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         Cart cartClient = new Cart();
-        Client user = Client.builder().firstName(request.getFirstName()).
-                lastName(request.getLastName()).
-                email(request.getEmail()).
-                cart(cartClient).
-                password(passwordEncoder.encode(request.getPassword())).
-                role(Role.USER).
-                build();
+        Client user ;
+        if(request.getEmail().equals("admin@progettoPSW.it")){
+            user = Client.builder().firstName(request.getFirstName()).
+                    lastName(request.getLastName()).
+                    email(request.getEmail()).
+                    cart(cartClient).
+                    password(passwordEncoder.encode(request.getPassword())).
+                    role(Role.ADMIN).
+                    build();
+        }else {
+            user = Client.builder().firstName(request.getFirstName()).
+                    lastName(request.getLastName()).
+                    email(request.getEmail()).
+                    cart(cartClient).
+                    password(passwordEncoder.encode(request.getPassword())).
+                    role(Role.USER).
+                    build();
+        }
         cartClient.setClient(user);
         var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);

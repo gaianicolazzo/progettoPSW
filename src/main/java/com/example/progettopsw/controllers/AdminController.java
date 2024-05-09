@@ -6,8 +6,10 @@ import com.example.progettopsw.exceptions.BrandNotFoundException;
 import com.example.progettopsw.exceptions.InvalidProductException;
 import com.example.progettopsw.exceptions.ProductAlreadyExistsException;
 import com.example.progettopsw.modules.Brand;
+import com.example.progettopsw.modules.Client;
 import com.example.progettopsw.modules.Product;
 import com.example.progettopsw.repositories.BrandRepository;
+import com.example.progettopsw.services.ClientService;
 import com.example.progettopsw.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +30,9 @@ public class AdminController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    ClientService clientService;
 
 
 
@@ -42,7 +49,7 @@ public class AdminController {
                 ret.setName(product.getName());
                 ret.setBrand(brand);
                 ret.setBarCode(product.getBarCode());
-                ret.setCreatData(product.getCreatData());
+                ret.setCreatData(new Date());
                 ret.setDescr(product.getDescr());
                 ret.setColor(product.getColor());
                 ret.setCategory(product.getCategory());
@@ -89,6 +96,8 @@ public class AdminController {
         else
             return new ResponseEntity<>(null, HttpStatus.OK);
     }
+
+
 
 
 
