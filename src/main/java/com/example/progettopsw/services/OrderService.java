@@ -38,7 +38,7 @@ public class OrderService {
     ClientService cserv;
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = {QtyUnavaliableException.class, PrizeChangedException.class})
-    public boolean crea(Cart cart, List<ProductInCartDTO> items, Client client) throws QtyUnavaliableException, PrizeChangedException, ProductOutOfStockException,InvalidClientException, CartNotFoundException{
+    public boolean crea(Cart cart, List<ProductInCart> items, Client client) throws QtyUnavaliableException, PrizeChangedException, ProductOutOfStockException,InvalidClientException, CartNotFoundException{
         if(items.isEmpty())
             return true;
         if(cart==null)
@@ -55,8 +55,8 @@ public class OrderService {
         o.setClient(clientManaged.get());
         o.setCreatDate(new Date(System.currentTimeMillis()));
         ordrep.save(o);
-        for(ProductInCartDTO itd:items){
-            Optional<Product> op = prep.findProductByCategory(itd.getProduct().getCategory());
+        for(ProductInCart itd:items){
+            Optional<Product> op = prep.findProductByName(itd.getProduct().getName());
             if(!op.isPresent()) throw new ProductOutOfStockException();
             Product p = op.get();
             if(p.getPrize() != itd.getPrize())

@@ -71,7 +71,7 @@ public class AdminController {
 
     @PreAuthorize("hasAuthority('admin')")
     @PostMapping(value="brand")
-    public ResponseEntity<String> putBrand(@RequestBody String nomeBrand) {
+    public ResponseEntity<String> putBrand(@RequestParam(value = "nome") String nomeBrand) {
         Brand ret = null;
         try{
             Brand tmp=new Brand(nomeBrand);
@@ -97,6 +97,14 @@ public class AdminController {
             return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
+
+    @PreAuthorize("hasAuthority('admin')")
+    @GetMapping(value="clients")
+    public ResponseEntity<List<Client>> getAllClients(){
+        List<Client> ret = clientService.showAllClients();
+        return new ResponseEntity<>(ret, HttpStatus.OK);
+
+    }
 
 
 

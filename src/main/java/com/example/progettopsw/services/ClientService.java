@@ -4,13 +4,11 @@ import com.example.progettopsw.exceptions.*;
 import com.example.progettopsw.modules.*;
 import com.example.progettopsw.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.*;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ClientService {
@@ -105,45 +103,54 @@ public class ClientService {
     }
 
 
-    public Product addProduct(Cart cart, Product product, int qty){
-        if(product == null || product.getPrize()<0.0)
+    public Product addProduct(Cart cart, Product product, int qty) {
+        if (product == null || product.getPrize() < 0.0)
             throw new InvalidProductException();
-        if(cart == null)
+        if (cart == null)
             throw new CartNotFoundException();
-        Optional<Cart> foundCart=carep.findById(cart.getId());
-
-        if(foundCart.isEmpty())
+        Optional<Cart> foundCart = carep.findById(cart.getId());
+        if (foundCart.isEmpty())
             throw new CartNotFoundException();
-        Optional<Product> foundProduct= prep.findById(product.getId());
-        if(foundProduct.isEmpty())
+        Optional<Product> foundProduct = prep.findById(product.getId());
+        if (foundProduct.isEmpty())
             throw new InvalidProductException();
-
-        if(foundProduct.get().getAvailablePz()<1)
+        if (foundProduct.get().getAvailablePz() < 1)
             throw new ProductOutOfStockException();
-        if(foundProduct.get().getAvailablePz()<qty)
+        if (foundProduct.get().getAvailablePz() < qty)
             throw new QtyUnavaliableException();
 
-        ProductInCart pc = new ProductInCart(foundProduct.get());
-        pc.setQty(qty);
-
-        int qtyCart = foundCart.get().getQty();
-
-        if(foundCart.get().getProducts() == null){
-            foundCart.get().setProducts(new LinkedList<>());
-        }else if(foundCart.get().getProducts().contains(pc)){
-            for(ProductInCart p : foundCart.get().getProducts())
-                if(p.equals(pc))
-                    p.setQty(p.getQty()+qty);
-            carep.save(foundCart.get());
-            return product;
+        if (foundCart.get().getProducts() != null) {
+            // Controlla se il prodotto è già presente nel carrello
+            boolean productFound = false;
+            for (ProductInCart p : foundCart.get().getProducts()) {
+                if (p.getProduct().getId() == (product.getId())) {
+                    // Aggiorna la quantità del prodotto esistente nel carrello
+                    p.setQty(p.getQty() + qty);
+                    productFound = true;
+                    break;
+                }
+            }
+            if (!productFound) {
+                // Se il prodotto non è già presente nel carrello, aggiungilo come nuovo prodotto
+                ProductInCart pc = new ProductInCart(product);
+                pc.setQty(qty);
+                foundCart.get().getProducts().add(pc);
+            }
+        } else {
+            // Se il carrello non ha ancora nessun prodotto, aggiungi il prodotto come nuovo
+            List<ProductInCart> products = new ArrayList<>();
+            ProductInCart pc = new ProductInCart(product);
+            pc.setQty(qty);
+            products.add(pc);
+            foundCart.get().setProducts(products);
         }
 
-        foundCart.get().getProducts().add(pc);
+        // Aggiorna la quantità totale del carrello
         foundCart.get().setQty(foundCart.get().getProducts().size());
         carep.save(foundCart.get());
-
         return product;
     }
+
 
     @Transactional(readOnly = true)
     public Optional<ProductInCart> showProductsById(long id){
@@ -225,5 +232,38 @@ public class ClientService {
         }
         return Optional.empty();
     }
+
+    public boolean substitute(ProductInCart productInCart,int qty, Cart cart) {
+        if (cart == null)
+            throw new CartNotFoundException();
+        if (productInCart == null)
+            throw new ProductNotFoundException();
+
+        Optional<Cart> foundCart = carep.findById(cart.getId());
+        if (!foundCart.isPresent())
+            throw new CartNotFoundException();
+
+        Optional<ProductInCart> productInCartTmp = prodincrep.findById(productInCart.getId());
+        if (!productInCartTmp.isPresent())
+            throw new ProductNotFoundException();
+
+        Cart existingCart = foundCart.get();
+        List<ProductInCart> products = existingCart.getProducts();
+        boolean productFound = false;
+        for (ProductInCart product : products) {
+            if (product.equals(productInCartTmp.get())) {
+                product.setQty(qty);
+                productFound = true;
+                break;
+            }
+        }
+        if (productFound) {
+            carep.save(existingCart);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
 }

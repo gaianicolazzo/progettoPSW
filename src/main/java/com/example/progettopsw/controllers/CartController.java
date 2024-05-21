@@ -5,6 +5,7 @@ import com.example.progettopsw.DTO.ProductDTO;
 import com.example.progettopsw.DTO.ProductInCartDTO;
 import com.example.progettopsw.exceptions.*;
 import com.example.progettopsw.modules.*;
+import com.example.progettopsw.repositories.ProductInCartRepository;
 import com.example.progettopsw.security.ApplicationConfig;
 import com.example.progettopsw.security.JwtService;
 import com.example.progettopsw.services.CartService;
@@ -43,8 +44,11 @@ public class CartController {
     @Autowired
     JwtService jwt;
 
+    @Autowired
+    ProductInCartRepository prodInCrep;
 
-    @GetMapping
+
+    @GetMapping("/productsInCart")
     public ResponseEntity<List<ProductInCartDTO>> getProductsInCart(Authentication auth){
         Cart cart = null;
         try{
@@ -74,7 +78,7 @@ public class CartController {
             String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
-            Optional<Product> productTmp = productService.showProductsByCategory(product.getCategory());
+            Optional<Product> productTmp = productService.findProductByName(product.getName());
             if(!productTmp.isPresent())
                 return new ResponseEntity<>("Product not present in shop", HttpStatus.NOT_FOUND);
             productToAdd = productTmp.get();
@@ -85,7 +89,7 @@ public class CartController {
         }
         try{
             Product ret = clientService.addProduct(cart, productToAdd, product.getAvailablePz()); // richiamiamo getAvailablePz ma in realta i pezzi disponibili sono in productToAdd mentre il primo fa riferimento alla quantita che vogliamo
-            return new ResponseEntity<>(ret.toString(),HttpStatus.OK);
+            return new ResponseEntity<>("Product added correctly",HttpStatus.OK);
         }catch(InvalidProductException ipe){
             return new ResponseEntity<>("Invalid product", HttpStatus.NOT_ACCEPTABLE);
         }catch(ProductOutOfStockException poose){
@@ -133,18 +137,49 @@ public class CartController {
             return new ResponseEntity<>("Operation not completed ", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PreAuthorize("hasAuthority('client')")
-    @PostMapping(value="/order")
-    public ResponseEntity<String> order(@RequestBody List<ProductInCartDTO> products, Authentication auth) {
+    @PostMapping("/addQty")
+    public ResponseEntity<String> addQty(@RequestBody ProductDTO product, @RequestParam(value = "qty") int qty, Authentication auth) {
         Cart cart = null;
         Optional<ProductInCart> productInCart;
         try {
             String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             cart = clientService.getCartFromClient(c);
-            boolean res = orderService.crea(cart, products, c);
+            productInCart = clientService.getProductFromCart(product.getName(), product.getColor(), cart);
+        } catch (InvalidClientException e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        } catch (ProductNotFoundException e) {
+            return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
+        }
+        try {
+            boolean res = clientService.substitute(productInCart.get(),qty, cart);
+            return res ? new ResponseEntity<>("true", HttpStatus.OK) : new ResponseEntity<>("false", HttpStatus.NOT_FOUND);
+        } catch (ProductNotFoundException pnfe) {
+            return new ResponseEntity<>("Product already cancelled", HttpStatus.NOT_FOUND);
+        } catch (CartNotFoundException cnfe) {
+            return new ResponseEntity<>("Cart not found", HttpStatus.NOT_FOUND);
+        } catch (InvalidProductException ipe) {
+            return new ResponseEntity<>("Product not in cart", HttpStatus.NOT_FOUND);
+        } catch (OptimisticLockingFailureException olfe) {
+            return new ResponseEntity<>("Operation not completed ", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('client')")
+    @PostMapping(value="/order")
+    public ResponseEntity<String> order( Authentication auth) {
+        Cart cart = null;
+        List<ProductInCart> productInCart;
+        try {
+            String email = auth.getName();
+            Client c = clientService.getClientFromEmail(email);
+            cart = clientService.getCartFromClient(c);
+            productInCart = prodInCrep.findAll();
+            boolean res = orderService.crea(cart, productInCart, c);
             if (res) {
-                return new ResponseEntity<>("Order.java completed correctly", HttpStatus.OK);
+                return new ResponseEntity<>("true", HttpStatus.OK);
             }
         } catch (CartNotFoundException cnfe) {
             return new ResponseEntity<>("Cart not found", HttpStatus.NOT_FOUND);
@@ -155,7 +190,7 @@ public class CartController {
         } catch (OptimisticLockingFailureException olfe) {
             return new ResponseEntity<>("Operation failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }//try catch
-        return new ResponseEntity<>("Order.java of : " + products + " \n failed. Try again", HttpStatus.PERMANENT_REDIRECT);
+        return new ResponseEntity<>("Order.java of : " + productInCart + " \n failed. Try again", HttpStatus.PERMANENT_REDIRECT);
     }
 
 

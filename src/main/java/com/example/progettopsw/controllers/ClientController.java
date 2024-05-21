@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -30,23 +31,20 @@ public class ClientController {
 
     @PreAuthorize("hasAuthority('client')")
     @GetMapping(value = "/orders")
-    public ResponseEntity<List<OrderDTO>> getOrdersList(){
+    public ResponseEntity<List<OrderDTO>> getOrdersList(Authentication auth){
         try{
-            String email = applicationConfig.userDetailsService().toString();
+            String email = auth.getName();
             Client c = clientService.getClientFromEmail(email);
             if (c == null) {
                 return ResponseEntity.notFound().build();
             }
             List<Order> orders = orderService.getOrdini(email);
-            if(orders.size()==0){
-                return ResponseEntity.notFound().build();
-            }
 
             List<OrderDTO> ret =new LinkedList<>();
             for(Order ordine : orders)
                 ret.add(new OrderDTO(ordine));
 
-            return ResponseEntity.ok(ret);
+            return new ResponseEntity<>(ret, HttpStatus.OK);
         }catch (ClientDoesntExistException e){
             return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
         }

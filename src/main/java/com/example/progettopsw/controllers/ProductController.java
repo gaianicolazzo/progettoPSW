@@ -34,7 +34,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getAllProducts(@RequestParam(value= "pageNumber", defaultValue="0") int pageNumber,
                                                            @RequestParam(value= "pageSize", defaultValue="10") int pageSize,
                                                            @RequestParam(value= "sortBy", defaultValue="id") String sortBy){
-        List<Product> res = productService.showAllProducts(pageNumber,pageSize,sortBy);
+        List<Product> res = productService.showProductsByAvailablePieces(pageNumber,pageSize,sortBy);
         List<ProductDTO> ret =new LinkedList<>();
         for(Product prod : res)
             ret.add(new ProductDTO(prod));
@@ -64,7 +64,7 @@ public class ProductController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
 
-        Optional<Product> filteredProducts = productService.showProductsByCategory(category);
+        List<Product> filteredProducts = productService.showProductsByCategory(category);
 
 
         // Paginate the results based on page and pageSize

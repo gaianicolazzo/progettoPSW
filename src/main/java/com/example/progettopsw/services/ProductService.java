@@ -7,7 +7,6 @@ import com.example.progettopsw.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +25,15 @@ public class ProductService {
     public List<Product> showAllProducts(int pageNumber, int pageSize, String sortBy){
         Pageable paging = PageRequest.of(pageNumber,pageSize,Sort.by(sortBy));
         Page<Product> products = productRepository.findAll(paging);
+        if (products.hasContent())
+            return products.getContent();
+        return new ArrayList<>();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> showProductsByAvailablePieces(int pageNumber, int pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNumber,pageSize,Sort.by(sortBy));
+        Page<Product> products = productRepository.findByAvailablePzGreaterThan(0, paging);;
         if (products.hasContent())
             return products.getContent();
         return new ArrayList<>();
@@ -59,7 +67,7 @@ public class ProductService {
 
 
     @Transactional(readOnly = true)
-    public Optional<Product> showProductsByCategory(String category){
+    public List<Product> showProductsByCategory(String category){
         return productRepository.findProductByCategory(category);
     }
 
@@ -76,10 +84,6 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Optional<Brand> getBrandByName(String name){
         return brandRepository.findByName(name);
-    }
-
-    public List<Product> showAvailablePieces(int qty){
-        return productRepository.findByAvailablePzGreaterThanEqual(qty);
     }
 
 
@@ -112,4 +116,7 @@ public class ProductService {
 
 
 
+    public Optional<Product> findProductByName(String name) {
+        return productRepository.findProductByName(name);
+    }
 }
